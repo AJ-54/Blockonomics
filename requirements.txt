@@ -1,0 +1,12 @@
+asgiref==3.3.1
+certifi==2020.12.5
+chardet==3.0.4
+Django==3.1.4
+idna==2.10
+pytz==2020.4
+requests==2.25.0
+sqlparse==0.4.1
+urllib3==1.26.2
+uuid==1.30
+gunicorn==19.7.1
+whitenoise==5.0.1
