@@ -35,7 +35,7 @@ def track_invoice(request, pk):
             'value':invoice.product.price,
             'addr': invoice.address,
             'status':Invoice.STATUS_CHOICES[invoice.status+1][1],
-            'invoice_status': max(0,invoice.status),
+            'invoice_status': invoice.status,
         }
     if (invoice.received):
         data['paid'] =  invoice.received/1e8
