@@ -69,7 +69,11 @@
             </div>
         </div>
       </div>
-      <script src="{% static 'js/invoice.js' %}"></script>
+      <script type="text/javascript">
+        var address="{{addr}}";
+        var status="{{invoice_status}}";
+      </script>
+      <script type="text/javascript" src="{% static 'js/invoice.js' %}"></script>
       
 </body>
 </html>
