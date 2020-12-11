@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 {% load static %}
 <html lang="en">
   <head>
@@ -33,7 +33,7 @@
         <h4 class="title is-4">Order#: {{order_id}}</h4>
         <hr>     
         <div class="row">
-            <div id="paymentstatus" style="color:blue;display:true;">Payment Status: Pending</div>
+            <div id="paymentstatus" style="color:blue;display:true;">Payment Status: {{status}}</div>
             <div class="col-md-6 col-sm-12">
             <p>Amount: <strong>{{bits}}</strong> BTC ⇌ <strong>{{value}}</strong> USD</p>
             <p>Bitcoin Address : <strong>{{addr}}</strong></p>
@@ -45,7 +45,7 @@
                 <h4 class="subtitle">Order Details: </h4>
                 <table class="table">
                 <tbody>
-                    <tr ng-repeat="item in invoice.cart">
+                    <tr>
                     <td>HD DSLR Image- Himalaya</td>
                     <td>x 1</td>
                     <td>${{value}}</td>
@@ -54,45 +54,22 @@
                     <td colspan="2" align=left><strong>Total:</strong></td>
                     <td><strong>${{value}}</strong></td>
                     </tr>
+                    <tr>
+                      <td colspan="2" align=left><strong>Paid Bitcoins:</strong></td>
+                      <td><strong>{{paid}}</strong></td>
+                      </tr>
+                    
                 </tbody>
                 </table>
-                <div id="paidimage" style="display: none;">
-                    <img src='{% static "img/actual.jpg" %}'>
+                {% if path %}
+                <div>
+                    <img id="my_image" src='{{path}}'>
                 </div>
+                {% endif %}
             </div>
         </div>
       </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
-    <script>
-        (function worker() {
-            $.ajax({
-              url: "{% url 'payments:check_payment' %}",
-              method: 'GET',
-              data:  {"addr": "{{addr}}" },
-              timeout: 60000,
-              success: function(data) {
-                
-                if (data.status === 2){
-                    $('#paymentstatus').text("Payment Status: Confirmed");
-                    $('#paidimage').show();
-                }
-                else if (data.status === 1){
-                    $('#paymentstatus').text("Payment Status: Partly Confirmed");
-                }
-                else if (data.status == 0){
-                    $('#paymentstatus').text("Payment Status: UnConfirmed");
-                }
-              },
-              complete: function() {
-                // Schedule the next request when the current one's complete
-                var imagetrack = document.getElementById('paidimage');
-                if (imagetrack.style.display == 'none'){
-                    setTimeout(worker, 5000);
-                }
-              }
-            });
-          })();
-          worker();
-    </script>
+      <script src="{% static 'js/invoice.js' %}"></script>
+      
 </body>
 </html>

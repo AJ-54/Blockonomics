@@ -34,26 +34,23 @@
 
     <div class="container-fluid">
         <h1> Products for Showcase!</h1>
-        <form method='POST' action="{% url 'payments:create_payment' %}">
-            {% csrf_token %}
+        {% for product in products %}
             <div class='row'>
                 <div class='col-lg-3'>
                     <div class="card-group">
                         <div class="card">
                         <img src="{% static 'img/thumb.jpg' %}" class="card-img-top" alt="...">
                         <div class="card-body">
-                            <h5 class="card-title">HD DSLR Image- Himalaya</h5>
-                            <p class="card-text">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iste obcaecati quis laudantium illo nobis expedita fugit, nesciunt voluptas harum sequi incidunt debitis aspernatur, ullam alias quidem nihil aliquam. Praesentium, laudantium?</p>
-                            <p class="card-text"><button type="submit" class="btn btn-primary">Price: 0.20 USD</button></p>
+                            <h5 class="card-title">{{product.title}}</h5>
+                            <p class="card-text">{{product.description}}</p>
+                            <input hidden name="id" value="{{product.id}}">
+                            <p class="card-text"><a href="{% url 'payments:create_payment' pk=product.id %}"><button class="btn btn-primary">Price: {{product.price}} USD</button></a></p>
                         </div>
                         </div>
                     </div>
                 </div>
-                <div class='col-2'>
-
-                </div>
             </div>
-        </form>
+        {% endfor %}
     </div>
     
 

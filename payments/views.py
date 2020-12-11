@@ -1,54 +1,72 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render,reverse
+from django.http import HttpResponse,HttpResponseRedirect
 from django.conf import settings
 
 import datetime
 import json
 import requests
 import uuid
+import os
 
 from .models import *
 # Create your views here.
 
 def home(request):
-    return render(request, 'product.html')
 
-def exchanged_rate():
+    products = Product.objects.all()
+    return render(request, 'product.html', context = {"products":products})
+
+def exchanged_rate(amount):
     url = "https://blockchain.info/tobtc?"
     params = {
         "currency":"USD",
-        "value":0.02,
+        "value":amount,
     }
     r = requests.get(url, params= params)
     print(r.json())
     return r.json()
 
-def create_payment(request):
-    amount = 0.02 # In USD
+def track_invoice(request, pk):
+    invoice_id = pk
+    invoice = Invoice.objects.get(id=invoice_id)
+    data = {
+            'order_id':invoice.order_id,
+            'bits':invoice.value/1e8,
+            'value':invoice.product.price,
+            'addr': invoice.address,
+            'status':Invoice.STATUS_CHOICES[invoice.status+1][1],
+            'invoice_status': invoice.status,
+        }
+    if (invoice.received):
+        data['paid'] =  invoice.received/1e8
+        if (int(invoice.value) <= int(invoice.received)):
+            data['path'] = invoice.product.product_image.url
+    else:
+        data['paid'] = 0  
 
+    return render(request,'invoice.html',context=data)
+
+def create_payment(request, pk):
+    
+    product_id = pk
+    product = Product.objects.get(id=product_id)
     url = 'https://www.blockonomics.co/api/new_address'
     headers = {'Authorization': "Bearer " + settings.API_KEY}
     r = requests.post(url, headers=headers)
     print(r.json())
     if r.status_code == 200:
         address = r.json()['address']
-        bits = exchanged_rate()
+        bits = exchanged_rate(product.price)
         order_id = uuid.uuid1()
-        data = {
-            'order_id':order_id,
-            'bits':bits,
-            'value':0.02,
-            'addr': address,
-        }
-        Invoice.objects.create(order_id=order_id,
-        address=address,value=bits)
-        return render(request,"invoice.html", context=data)
+        invoice = Invoice.objects.create(order_id=order_id,
+                                address=address,value=bits*1e8, product=product)
+        return HttpResponseRedirect(reverse('payments:track_payment', kwargs={'pk':invoice.id}))
     else:
         print(r.status_code, r.text)
         return HttpResponse("Some Error, Try Again!")
     
 def receive_payment(request):
-    print(request.method)
+    
     if (request.method != 'GET'):
         return 
     
@@ -58,19 +76,24 @@ def receive_payment(request):
     addr = request.GET.get('addr')
 
     invoice = Invoice.objects.get(address = addr)
+    
     invoice.status = int(status)
-    invoice.received = float(value)
+    if (int(status) == 2):
+        invoice.last_amount = value
+        if (invoice.received):
+            invoice.received += float(value)
+        else:
+            invoice.received = float(value)
     invoice.txid = txid
     invoice.save()
     return HttpResponse(200)
 
-def check_payment(request):
-    if (request.method != 'GET'):
+def send_image(request):
+    if (request.method != 'POST'):
         return 
-    address = request.GET.get('addr')
+    address = request.POST.get('addr')
     invoice_obj = Invoice.objects.get(address = address)
     data = {
-        'status':invoice_obj.status,
+        'url':invoice_obj.product.product_image,
     }
-    print(address)
     return HttpResponse(json.dumps(data), content_type='application/json')
