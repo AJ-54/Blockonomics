@@ -12,6 +12,9 @@ The Demo is hosted at https://blockonomics.herokuapp.com
 *  Come to root folder
 * `pip install requirements.txt`
 * `python manage.py runserver`
+ 
+> Once you login to blockonomics website, head over to merchant section to get your API KEY.
+> Inside Blockonomics folder, go to settings.py file and place your blockonomics API KEY to the API_KEY variable.
 
 ## Tech Stack
 
