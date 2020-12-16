@@ -17,9 +17,8 @@ def home(request):
     return render(request, 'product.html', context = {"products":products})
 
 def exchanged_rate(amount):
-    url = "https://blockchain.info/tobtc?"
+    url = "blockonomics.co/api/price?currency=USD"
     params = {
-        "currency":"USD",
         "value":amount,
     }
     r = requests.get(url, params= params)
@@ -87,13 +86,3 @@ def receive_payment(request):
     invoice.txid = txid
     invoice.save()
     return HttpResponse(200)
-
-def send_image(request):
-    if (request.method != 'POST'):
-        return 
-    address = request.POST.get('addr')
-    invoice_obj = Invoice.objects.get(address = address)
-    data = {
-        'url':invoice_obj.product.product_image,
-    }
-    return HttpResponse(json.dumps(data), content_type='application/json')

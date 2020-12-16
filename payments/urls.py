@@ -8,7 +8,5 @@ urlpatterns = [
     path('payments/create/<pk>', views.create_payment, name='create_payment'),
     path('payment/invoice/<pk>',views.track_invoice, name='track_payment'),
     path('payments/receive/', views.receive_payment, name='receive_payment'),
-    path('payments/check/', views.send_image, name='receive_image'),
-
 ]
 
