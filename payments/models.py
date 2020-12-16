@@ -29,7 +29,7 @@ class Invoice(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES, default=-1)
     order_id = models.CharField(max_length=250)
     address = models.CharField(max_length=250, blank=True, null=True)
-    btcvalue = models.FloatField(blank=True, null=True)
+    btcvalue = models.IntegerField(blank=True, null=True)
     received = models.IntegerField(blank=True, null=True)
     txid = models.CharField(max_length=250, blank=True, null=True)
     rbf = models.IntegerField(blank=True, null=True)
