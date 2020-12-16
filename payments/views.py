@@ -18,12 +18,10 @@ def home(request):
 
 def exchanged_rate(amount):
     url = "blockonomics.co/api/price?currency=USD"
-    params = {
-        "value":amount,
-    }
+    
     r = requests.get(url, params= params)
-    print(r.json())
-    return r.json()
+    response = r.json()
+    return amount/response['price']
 
 def track_invoice(request, pk):
     invoice_id = pk
