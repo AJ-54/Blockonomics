@@ -17,9 +17,8 @@ def home(request):
     return render(request, 'product.html', context = {"products":products})
 
 def exchanged_rate(amount):
-    url = "blockonomics.co/api/price?currency=USD"
-    
-    r = requests.get(url, params= params)
+    url = "https://www.blockonomics.co/api/price?currency=USD"
+    r = requests.get(url)
     response = r.json()
     return amount/response['price']
 
@@ -28,7 +27,7 @@ def track_invoice(request, pk):
     invoice = Invoice.objects.get(id=invoice_id)
     data = {
             'order_id':invoice.order_id,
-            'bits':invoice.value/1e8,
+            'bits':invoice.btcvalue/1e8,
             'value':invoice.product.price,
             'addr': invoice.address,
             'status':Invoice.STATUS_CHOICES[invoice.status+1][1],
@@ -36,7 +35,7 @@ def track_invoice(request, pk):
         }
     if (invoice.received):
         data['paid'] =  invoice.received/1e8
-        if (int(invoice.value) <= int(invoice.received)):
+        if (int(invoice.btcvalue) <= int(invoice.received)):
             data['path'] = invoice.product.product_image.url
     else:
         data['paid'] = 0  
@@ -56,7 +55,7 @@ def create_payment(request, pk):
         bits = exchanged_rate(product.price)
         order_id = uuid.uuid1()
         invoice = Invoice.objects.create(order_id=order_id,
-                                address=address,value=bits*1e8, product=product)
+                                address=address,btcvalue=bits*1e8, product=product)
         return HttpResponseRedirect(reverse('payments:track_payment', kwargs={'pk':invoice.id}))
     else:
         print(r.status_code, r.text)
@@ -76,11 +75,7 @@ def receive_payment(request):
     
     invoice.status = int(status)
     if (int(status) == 2):
-        invoice.last_amount = value
-        if (invoice.received):
-            invoice.received += float(value)
-        else:
-            invoice.received = float(value)
+        invoice.received = value
     invoice.txid = txid
     invoice.save()
     return HttpResponse(200)
