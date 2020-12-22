@@ -13,6 +13,8 @@ The Demo is hosted at https://blockonomics.herokuapp.com
 * `python manage.py migrate`
 * `python manage.py runserver`
 
+Note that Python 3.6 or higher version is required to run the project
+
 ## Tech Stack
 
 * Python
