@@ -101,8 +101,8 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-# Blockonomics
-API_KEY = 'y2dm2JanKqf8AFhBCXAsg59RFS01CVXaYNDArUgMN5E'
+# Place Your Blockonomics API Key Here
+API_KEY = os.environ.get('API_KEY')
 
 
 # Internationalization
